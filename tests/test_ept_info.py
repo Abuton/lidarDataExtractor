@@ -30,7 +30,39 @@ class TestInfo(unittest.TestCase):
         actual_span = 256
         self.assertEqual(self.ept.get_span(), actual_span)
 
+    def test_get_version(self):
+        actual_version = "1.1.0"
+        self.assertEqual(self.ept.get_version(), actual_version)
 
+    def test_get_bounds(self):
+        actual_bounds = [
+                        -11752672,
+                        4740364,
+                        -68269,
+                        -11610700,
+                        4882336,
+                        73703
+                    ]
+        self.assertEqual(self.ept.get_bounds(), actual_bounds)
+    
+    def test_get_conforming(self):
+        actual_bounds_conforming = [
+                                -11752670,
+                                4750545,
+                                1136,
+                                -11610701,
+                                4872154,
+                                4297
+                            ]
+        self.assertEqual(self.ept.get_conforming(), actual_bounds_conforming)
+
+    def test_get_datatype(self):
+        actual_datatype = "laszip"
+        self.assertEqual(self.ept.get_datatype(), actual_datatype)
+
+    def test_get_hierachytype(self):
+        actual_hierarchy= "json"
+        self.assertEqual(self.ept.get_hierarchytype(), actual_hierarchy)
 
 
 if __name__ == '__main__':
