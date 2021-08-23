@@ -51,7 +51,7 @@ class Schema(object):
 
     def get_dtype(self) -> np.dtype:
         """
-        gets the data type of the key in an entwine file
+        gets the data type of the keys in an entwine file
         """
         dt = []
         for d in self.dimesions:
