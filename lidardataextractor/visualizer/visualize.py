@@ -13,6 +13,9 @@ from rasterio.transform import from_bounds, from_origin
 from rasterio.warp import reproject, Resampling
 
 class VisualizeRaster:
+    """ 
+    A module to visualize the raster files
+    """
 
     def __init__(self, data_file_path) -> None:
         # Open the DEM with Rasterio
@@ -21,6 +24,19 @@ class VisualizeRaster:
         self.elevation = elevation
 
     def plot_bands(self, hillshade:bool=False, azimuth:int=150)->None:
+        """
+
+        Parameters
+        ----------
+        hillshade:bool :
+             (Default value = False)
+        azimuth:int :
+             (Default value = 150)
+
+        Returns
+        -------
+
+        """
         if hillshade:
             # Create and plot the hillshade with earthpy
             hillshade = es.hillshade(self.elevation, azimuth=azimuth)
@@ -47,6 +63,9 @@ class VisualizeRaster:
                     
 
     def plot_overlay(self)->None:
+        """ 
+        Plot Overlays on the raster image
+        """
         # Create and plot the hillshade with earthpy
         hillshade = es.hillshade(self.elevation)
 
@@ -63,7 +82,20 @@ class VisualizeRaster:
         plt.show()
         plt.savefig('images/overlay.png')
 
-    def explore(self, tif_path, product:str=None):
+    def explore(self, tif_path, product:str=None) -> None:
+        """
+
+        Parameters
+        ----------
+        tif_path : tif file path
+            
+        product:str :
+             (Default value = None)
+
+        Returns
+        -------
+
+        """
         raster = rio.open(tif_path)
         bounds = raster.bounds
         west, south, east, north = bounds
@@ -101,6 +133,21 @@ class VisualizeRaster:
         extent = xmin, xmax, ymin, ymax = 268000.0, 423500.0, 5094500.0, 5207000.0
 
         def hillshade(array, azimuth, angle_altitude):
+            """
+
+            Parameters
+            ----------
+            array : raster array files
+                
+            azimuth :
+                
+            angle_altitude :
+                
+
+            Returns
+            -------
+
+            """
 
             # Source: http://geoexamples.blogspot.com.br/2014/03/shaded-relief-images-using-gdal-python.html
 
