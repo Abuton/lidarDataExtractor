@@ -1,0 +1,20 @@
+name: Package-Module-Testing
+on: 
+  push:
+    branches:
+    - main
+jobs:
+  run:
+    runs-on: ubuntu-latest 
+    steps:
+    - uses: actions/checkout@v2
+    - name: cml_run
+      run: | 
+        pip install -r requirements.txt
+
+    - name: run-tests
+      run: |
+        python -m unittest tests.test_ept_info
+        python -m unittest tests.test_schema
+
+        
