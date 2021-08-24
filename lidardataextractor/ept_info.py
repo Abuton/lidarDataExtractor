@@ -1,7 +1,6 @@
 import json
 import schema
 import pyproj
-import numpy as np
 from pyproj import CRS
 from schema import Schema
 
