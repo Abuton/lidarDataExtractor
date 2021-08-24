@@ -1,9 +1,9 @@
 import json
-from lidardataextractor import schema
+import schema
 import pyproj
 import numpy as np
 from pyproj import CRS
-from lidardataextractor.schema import Schema
+from schema import Schema
 
 class Info(object):
     """ """
