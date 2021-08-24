@@ -4,6 +4,7 @@ shp/
 *.tif
 *.laz
 data/
+*.png
 .ipynb_checkpoints/
 # Compiled python modules.
 *.pyc
