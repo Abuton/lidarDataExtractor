@@ -2,6 +2,7 @@ __pycache__
 shp/
 *.csv
 *.tif
+*.laz
 data/
 .ipynb_checkpoints/
 # Compiled python modules.
