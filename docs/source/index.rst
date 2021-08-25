@@ -10,6 +10,15 @@ Welcome to lidardataextractor's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+.. rubrics:: Modules
+
+.. autosummary::
+   :toctree: generated
+
+
+   sphinxdemo_with_docs.__init__
+   sphinxdemo_with_docs.__main__
+   sphinxdemo_with_docs.file_functions
 
 
 Indices and tables
