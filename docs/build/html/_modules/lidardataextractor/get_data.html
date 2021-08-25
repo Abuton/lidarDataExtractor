@@ -1,0 +1,570 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>lidardataextractor.get_data &mdash; lidardataextractor 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> lidardataextractor
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/lidardataextractor.visualizer.visualize.html">lidardataextractor.visualizer.visualize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/lidardataextractor.schema.html">lidardataextractor.schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/lidardataextractor.ept_info.html">lidardataextractor.ept_info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/lidardataextractor.region_file_loader.html">lidardataextractor.region_file_loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/lidardataextractor.get_data.html">lidardataextractor.get_data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/lidardataextractor.__init__.html">__init__</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">lidardataextractor</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>lidardataextractor.get_data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for lidardataextractor.get_data</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">ast</span>
+<span class="kn">import</span> <span class="nn">pdal</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">lidardataextractor</span> <span class="kn">import</span> <span class="n">region_file_loader</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">from</span> <span class="nn">osgeo</span> <span class="kn">import</span> <span class="n">ogr</span><span class="p">,</span> <span class="n">osr</span><span class="p">,</span> <span class="n">gdal</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="n">form</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> : </span><span class="si">%(levelname)-5.5s</span><span class="s2"> : </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+
+<span class="n">consoleHandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+<span class="n">consoleHandler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">consoleHandler</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RasterGetter"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.html#lidardataextractor.get_data.RasterGetter">[docs]</a><span class="k">class</span> <span class="nc">RasterGetter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Get raster and laz files based on pdal pipeline&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RasterGetter.__init__"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.__init__.html#lidardataextractor.get_data.RasterGetter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">crs</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">bounds</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>   
+        <span class="bp">self</span><span class="o">.</span><span class="n">public_data_path</span> <span class="o">=</span> <span class="s2">&quot;https://s3-us-west-2.amazonaws.com/usgs-lidar-public/&quot;</span>
+        <span class="c1"># get region based in bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_regions</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_pipeline</span><span class="p">()</span></div>
+
+    <span class="c1"># import geopandas as gpd</span>
+    <span class="c1"># from shapely.geometry import Polygon</span>
+
+    <span class="c1"># MINX, MINY, MAXX, MAXY = [-93.756155, 41.918015, -93.747334, 41.921429]</span>
+    <span class="c1"># polygon = Polygon(((MINX, MINY), (MINX, MAXY), (MAXX, MAXY), (MAXX, MINY), (MINX, MINY)))</span>
+
+    <span class="c1"># grid = gpd.GeoDataFrame([polygon], columns=[&quot;geometry&quot;])</span>
+    <span class="c1"># grid.set_crs(epsg=4326, inplace=True)</span>
+
+<div class="viewcode-block" id="RasterGetter.get_regions"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.get_regions.html#lidardataextractor.get_data.RasterGetter.get_regions">[docs]</a>    <span class="k">def</span> <span class="nf">get_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The function get region based on input bound from the user</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bounds : str : the boundary of a region</span>
+<span class="sd">            </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot; Finding bounds region&quot;</span><span class="p">)</span>
+        <span class="n">region_ept_info</span> <span class="o">=</span> <span class="n">region_file_loader</span><span class="o">.</span><span class="n">load_ept_json</span><span class="p">()</span>
+        <span class="n">user_bounds</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+        <span class="n">regions</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">region_ept_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">user_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> \
+                <span class="n">value</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">user_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> \
+                <span class="n">value</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">user_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> \
+                <span class="n">value</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">user_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">regions</span></div>
+
+<div class="viewcode-block" id="RasterGetter.construct_pipeline"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.construct_pipeline.html#lidardataextractor.get_data.RasterGetter.construct_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">construct_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_pipeline</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;readers.ept&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tag&quot;</span><span class="p">:</span> <span class="s2">&quot;readdata&quot;</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+        <span class="n">classification_filter</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;limits&quot;</span><span class="p">:</span> <span class="s2">&quot;Classification![2:7], Classification![9:9]&quot;</span><span class="p">,</span> 
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;filters.range&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tag&quot;</span><span class="p">:</span> <span class="s2">&quot;nonoise&quot;</span>
+
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">classification_filter</span><span class="p">)</span>
+        <span class="n">reprojection</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;in_srs&quot;</span><span class="p">:</span> <span class="s2">&quot;EPSG:3857&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;out_srs&quot;</span><span class="p">:</span> <span class="s2">&quot;EPSG:3857&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tag&quot;</span><span class="p">:</span> <span class="s2">&quot;reprojectUTM&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;filters.reprojection&quot;</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reprojection</span><span class="p">)</span>
+        <span class="n">laz_writer</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;reprojectUTM&quot;</span> <span class="p">],</span>
+            <span class="s2">&quot;tag&quot;</span><span class="p">:</span> <span class="s2">&quot;writerslas&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;writers.las&quot;</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">laz_writer</span><span class="p">)</span>
+        <span class="n">tif_writer</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;gdalopts&quot;</span><span class="p">:</span> <span class="s2">&quot;tiled=yes,     compress=deflate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;writerslas&quot;</span> <span class="p">],</span>
+            <span class="s2">&quot;nodata&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9999</span><span class="p">,</span>
+            <span class="s2">&quot;output_type&quot;</span><span class="p">:</span> <span class="s2">&quot;idw&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;resolution&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;writers.gdal&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;window_size&quot;</span><span class="p">:</span> <span class="mi">6</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tif_writer</span><span class="p">)</span>
+
+        <span class="c1"># self.dynamic_pipeline = pdal.Pipeline(json.dumps(self.dynamic_pipeline))</span>
+    
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_pipeline</span></div>
+
+<div class="viewcode-block" id="RasterGetter.load_pipeline"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.load_pipeline.html#lidardataextractor.get_data.RasterGetter.load_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">load_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The Function loads a pipeline </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">external_pipeline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">construct_pipeline</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pipeline Succefully Constructed&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pipeline Could not be Constructed&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RasterGetter.get_raster_terrain"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.get_raster_terrain.html#lidardataextractor.get_data.RasterGetter.get_raster_terrain">[docs]</a>    <span class="k">def</span> <span class="nf">get_raster_terrain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The Function gets the raster terrain of a given region</span>
+<span class="sd">            It saves the laz and tif files in the specified </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bounds : str : bounds of the region to be computed</span>
+<span class="sd">            </span>
+<span class="sd">        region:str : region of the given bound</span>
+<span class="sd">            </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fetching Laz and tiff files for </span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">PUBLIC_ACCESS_PATH</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_data_path</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;ept.json&quot;</span>
+
+        <span class="c1"># dynamically update template pipeline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_pipeline</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;bounds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_pipeline</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PUBLIC_ACCESS_PATH</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_pipeline</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.laz&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_pipeline</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.tif&quot;</span>
+
+        <span class="c1"># create pdal pipeline</span>
+        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_pipeline</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pipeline Dumped and Ready for use&quot;</span><span class="p">)</span>
+        <span class="c1"># execute pipeline</span>
+        <span class="n">pipe_exec</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">metadata</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">log</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pipeline Complete Execution Succefully &quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RasterGetter.get_geodataframe"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.get_geodataframe.html#lidardataextractor.get_data.RasterGetter.get_geodataframe">[docs]</a>    <span class="k">def</span> <span class="nf">get_geodataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tif_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compute the Elevations in a raster tif file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tif_file : str : filename/location of a tif image</span>
+<span class="sd">   </span>
+<span class="sd">        region:str :</span>
+<span class="sd">            </span>
+<span class="sd">        save: bool :</span>
+<span class="sd">             (Default value = True)</span>
+<span class="sd">        viz:bool :</span>
+<span class="sd">             (Default value = False)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A GeoDataFrame</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_point_elevation_twi</span><span class="p">(</span><span class="n">tif_filename</span><span class="o">=</span><span class="n">tif_file</span><span class="p">,</span> <span class="n">shp_filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.shp&quot;</span><span class="p">,</span> 
+                                <span class="n">point_elevation_filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RasterGetter.reproject_crs"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.reproject_crs.html#lidardataextractor.get_data.RasterGetter.reproject_crs">[docs]</a>    <span class="k">def</span> <span class="nf">reproject_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">src_epsg</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">3857</span><span class="p">,</span> <span class="n">target_epsg</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span> <span class="o">-&gt;</span>  <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span> 
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The function will reproject a geodataframe</span>
+<span class="sd">        if the save argument is True, the geodataframe will be saved</span>
+<span class="sd">        and can be used for visualization on the map</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : a geopandas dataframe</span>
+<span class="sd">            </span>
+<span class="sd">        region:str : the region of the geo dataframe</span>
+<span class="sd">            </span>
+<span class="sd">        save :</span>
+<span class="sd">             (Default value = True)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A GeoDataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+
+        <span class="n">source</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
+        <span class="n">source</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="n">src_epsg</span><span class="p">)</span>
+
+        <span class="n">target</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="n">target_epsg</span><span class="p">)</span>
+
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">CoordinateTransformation</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">new_points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+            <span class="n">point</span> <span class="o">=</span> <span class="n">ogr</span><span class="o">.</span><span class="n">CreateGeometryFromWkt</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">point</span><span class="o">.</span><span class="n">Transform</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
+            <span class="n">new_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">ExportToWkt</span><span class="p">())</span>
+
+        <span class="n">new_df</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">elevation</span><span class="p">,</span> <span class="n">new_points</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">twi</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;elevation&#39;</span><span class="p">,</span> <span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;twi&#39;</span><span class="p">])</span>
+        
+        <span class="n">new_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">_reprojected.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file saved succesfully here </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RasterGetter.save_geodataframe"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.save_geodataframe.html#lidardataextractor.get_data.RasterGetter.save_geodataframe">[docs]</a>    <span class="k">def</span> <span class="nf">save_geodataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_filename</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Save a GeoDataFrame into a csv</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        csv_filename : str : filename of the csv to be created</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">csv_filename</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GeoDataframe Elevation File Successfully Saved here </span><span class="si">{</span><span class="n">csv_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RasterGetter.year_gpd_dict"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.year_gpd_dict.html#lidardataextractor.get_data.RasterGetter.year_gpd_dict">[docs]</a>    <span class="k">def</span> <span class="nf">year_gpd_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get year column based on bound&quot;&quot;&quot;</span>
+        <span class="n">year_gpd</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Bound Error! No region Found&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Getting laz and tif files from </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span><span class="si">}</span><span class="s1"> Regions&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">:</span>
+            <span class="n">year</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="n">year</span> <span class="o">=</span> <span class="n">region</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Getting DEM for </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_raster_terrain</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+                <span class="n">year_gpd</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_geodataframe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">viz</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_geodataframe</span><span class="p">(</span><span class="n">csv_filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;data/</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1"> Region Overlayed&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Moving to next region&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">year_gpd</span></div>
+
+<div class="viewcode-block" id="RasterGetter.tif_shp"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.tif_shp.html#lidardataextractor.get_data.RasterGetter.tif_shp">[docs]</a>    <span class="k">def</span> <span class="nf">tif_shp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shp_filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">tif_filename</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The function converts a tif file to a shp file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shp_filename:str : filename/path of the converted shp file</span>
+<span class="sd">            </span>
+<span class="sd">        tif_filename:str : filename/path of the tif file to be converted</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># mapping between gdal type and ogr field type</span>
+        <span class="n">type_mapping</span> <span class="o">=</span> <span class="p">{</span> <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_Byte</span><span class="p">:</span> <span class="n">ogr</span><span class="o">.</span><span class="n">OFTInteger</span><span class="p">,</span>
+                        <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_UInt16</span><span class="p">:</span> <span class="n">ogr</span><span class="o">.</span><span class="n">OFTInteger</span><span class="p">,</span>   
+                        <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_Int16</span><span class="p">:</span> <span class="n">ogr</span><span class="o">.</span><span class="n">OFTInteger</span><span class="p">,</span>    
+                        <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_UInt32</span><span class="p">:</span> <span class="n">ogr</span><span class="o">.</span><span class="n">OFTInteger</span><span class="p">,</span>
+                        <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_Int32</span><span class="p">:</span> <span class="n">ogr</span><span class="o">.</span><span class="n">OFTInteger</span><span class="p">,</span>
+                        <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_Float32</span><span class="p">:</span> <span class="n">ogr</span><span class="o">.</span><span class="n">OFTReal</span><span class="p">,</span>
+                        <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_Float64</span><span class="p">:</span> <span class="n">ogr</span><span class="o">.</span><span class="n">OFTReal</span><span class="p">,</span>
+                        <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_CInt16</span><span class="p">:</span> <span class="n">ogr</span><span class="o">.</span><span class="n">OFTInteger</span><span class="p">,</span>
+                        <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_CInt32</span><span class="p">:</span> <span class="n">ogr</span><span class="o">.</span><span class="n">OFTInteger</span><span class="p">,</span>
+                        <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_CFloat32</span><span class="p">:</span> <span class="n">ogr</span><span class="o">.</span><span class="n">OFTReal</span><span class="p">,</span>
+                        <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_CFloat64</span><span class="p">:</span> <span class="n">ogr</span><span class="o">.</span><span class="n">OFTReal</span><span class="p">}</span>
+
+        <span class="c1"># this allows GDAL to throw Python Exceptions</span>
+        <span class="n">gdal</span><span class="o">.</span><span class="n">UseExceptions</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;reading tif file...&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">tif_filename</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Unable to open file&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">srcband</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Band ( </span><span class="si">%i</span><span class="s1"> ) not found&#39;</span> <span class="o">%</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># create shapefile datasource from geotiff file</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;creating shapefile...&quot;</span><span class="p">)</span>
+        <span class="n">dst_layername</span> <span class="o">=</span> <span class="s2">&quot;Shape&quot;</span>
+        <span class="n">drv</span> <span class="o">=</span> <span class="n">ogr</span><span class="o">.</span><span class="n">GetDriverByName</span><span class="p">(</span><span class="s2">&quot;ESRI Shapefile&quot;</span><span class="p">)</span>
+        <span class="n">dst_ds</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">CreateDataSource</span><span class="p">(</span><span class="n">shp_filename</span><span class="p">)</span>
+        <span class="n">dst_layer</span> <span class="o">=</span> <span class="n">dst_ds</span><span class="o">.</span><span class="n">CreateLayer</span><span class="p">(</span><span class="n">dst_layername</span><span class="p">,</span> <span class="n">srs</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span>
+        <span class="n">raster_field</span> <span class="o">=</span> <span class="n">ogr</span><span class="o">.</span><span class="n">FieldDefn</span><span class="p">(</span><span class="s1">&#39;elevation&#39;</span><span class="p">,</span> <span class="n">type_mapping</span><span class="p">[</span><span class="n">srcband</span><span class="o">.</span><span class="n">DataType</span><span class="p">])</span>
+        <span class="n">dst_layer</span><span class="o">.</span><span class="n">CreateField</span><span class="p">(</span><span class="n">raster_field</span><span class="p">)</span>
+        <span class="n">gdal</span><span class="o">.</span><span class="n">Polygonize</span><span class="p">(</span><span class="n">srcband</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dst_layer</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[],</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> 
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Shp file created successfully here </span><span class="si">{</span><span class="n">shp_filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RasterGetter.get_point_elevation_twi"><a class="viewcode-back" href="../../generated/lidardataextractor.get_data.RasterGetter.get_point_elevation_twi.html#lidardataextractor.get_data.RasterGetter.get_point_elevation_twi">[docs]</a>    <span class="k">def</span> <span class="nf">get_point_elevation_twi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tif_filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">shp_filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">point_elevation_filename</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The function computes and returns a geodataframe</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tif_filename:str : filename/path of the converted tof file</span>
+<span class="sd">            </span>
+<span class="sd">        shp_filename:str : filename/path of the converted shp file</span>
+<span class="sd">            </span>
+<span class="sd">        point_elevation_filename:str :  filename/path of the converted csv file</span>
+<span class="sd">            </span>
+<span class="sd">        resolution:int : the resolution of the raster data</span>
+<span class="sd">             (Default value = 5)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        A GeoDataFrame</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tif_shp</span><span class="p">(</span><span class="n">shp_filename</span><span class="o">=</span><span class="n">shp_filename</span><span class="p">,</span> <span class="n">tif_filename</span><span class="o">=</span><span class="n">tif_filename</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">shp_filename</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Shp file read successfully&#39;</span><span class="p">)</span>
+        <span class="c1"># get area</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">area</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">centroid</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;slope&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;elevation&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">resolution</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;twi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;area&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;slope&#39;</span><span class="p">])</span>
+        
+        <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;elevation&#39;</span><span class="p">,</span> <span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;twi&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">point_elevation_filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Point Elevation csv File saved here </span><span class="si">{</span><span class="n">point_elevation_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
+        
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># BOUNDS = &quot;([-93.756155, -93.747334], [41.918015, 41.921429])&quot;</span>
+
+    <span class="c1"># ([minx, maxx], [miny, maxy])</span>
+    <span class="n">BOUNDS</span> <span class="o">=</span> <span class="s2">&quot;([-10425171.940, -10423171.940], [5164494.710, 5166494.710])&quot;</span>
+    <span class="n">MINX</span><span class="p">,</span> <span class="n">MINY</span><span class="p">,</span> <span class="n">MAXX</span><span class="p">,</span> <span class="n">MAXY</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">93.756155</span><span class="p">,</span> <span class="mf">41.918015</span><span class="p">,</span> <span class="o">-</span><span class="mf">93.747334</span><span class="p">,</span> <span class="mf">41.921429</span><span class="p">]</span>
+
+    <span class="n">raster</span> <span class="o">=</span> <span class="n">RasterGetter</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="n">BOUNDS</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>
+    <span class="c1"># year_dict = raster.year_gpd_dict()</span>
+    <span class="c1"># pprint(year_dict)</span>
+    <span class="n">raster</span><span class="o">.</span><span class="n">get_geodataframe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;IA_FullState.tif&quot;</span><span class="p">,</span> <span class="s2">&quot;IA_FullState&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Abuton.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

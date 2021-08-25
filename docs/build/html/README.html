@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>lidardataextractor : Overview &mdash; lidardataextractor 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="lidardataextractor.visualizer.visualize" href="generated/lidardataextractor.visualizer.visualize.html" />
+    <link rel="prev" title="Welcome to lidardataextractor’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> lidardataextractor
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation &amp; Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data">Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/lidardataextractor.visualizer.visualize.html">lidardataextractor.visualizer.visualize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/lidardataextractor.schema.html">lidardataextractor.schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/lidardataextractor.ept_info.html">lidardataextractor.ept_info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/lidardataextractor.region_file_loader.html">lidardataextractor.region_file_loader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/lidardataextractor.get_data.html">lidardataextractor.get_data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/lidardataextractor.__init__.html">__init__</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">lidardataextractor</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>lidardataextractor : Overview</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/README.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="lidardataextractor-overview">
+<h1>lidardataextractor : Overview<a class="headerlink" href="#lidardataextractor-overview" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://jupyter.org/try"><img alt="Made withJupyter" src="https://img.shields.io/badge/Made%20with-Jupyter-orange?style=for-the-badge&amp;logo=Jupyter" /></a>
+<p>Lidardataextractor is an open-source python package for retrieving, transforming, and visualizing point cloud data obtained through an aerial LiDAR survey. Using the package, you can select a region of interest, and download the related point cloud dataset with its metadata in different file formats (.laz, .tif, or as an ASCII file), perform transformation and visualization using the downloaded data.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">AWS</span> <span class="n">Account</span> <span class="p">:</span> <span class="n">Create</span> <span class="n">One</span> <span class="p">[</span><span class="n">here</span><span class="p">](</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">aws</span><span class="o">.</span><span class="n">amazon</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">resources</span><span class="o">/</span><span class="n">create</span><span class="o">-</span><span class="n">account</span><span class="o">/</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">PDAL</span> <span class="p">:</span> <span class="n">Python</span> <span class="n">Data</span> <span class="n">Abstraction</span> <span class="n">Library</span>
+<span class="o">-</span> <span class="n">boto3</span> <span class="p">:</span> <span class="n">Python</span> <span class="n">API</span> <span class="k">for</span> <span class="n">performing</span> <span class="n">actions</span><span class="o">/</span><span class="n">tasks</span> <span class="n">on</span> <span class="n">AWS</span>
+<span class="o">-</span> <span class="n">geopandas</span><span class="o">/</span><span class="n">rasterio</span> <span class="p">:</span> <span class="n">Python</span> <span class="n">library</span> <span class="n">to</span> <span class="n">manipulate</span> <span class="n">geospatial</span> <span class="n">datasets</span>
+<span class="o">-</span> <span class="n">earthpy</span> <span class="p">:</span> <span class="n">Used</span> <span class="k">for</span> <span class="n">Raster</span> <span class="n">data</span> <span class="n">Visualization</span>
+</pre></div>
+</div>
+<div class="section" id="data">
+<h3>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h3>
+<p>The USGS 3D Elevation Program (3DEP) provides access to lidar point cloud data from the 3DEP repository. The adoption of cloud storage and computing by 3DEP allows users to work with massive datasets of lidar point cloud data without having to download them.</p>
+<p>The point cloud data is freely accessible from AWS in EPT format. Entwine Point Tile (EPT) is a simple and flexible octree-based storage format for point cloud data. The organization of an EPT dataset contains JSON metadata portions as well as binary point data. The JSON file is core metadata required to interpret the contents of an EPT dataset.</p>
+</div>
+<div class="section" id="installation">
+<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
+<ol class="loweralpha simple">
+<li><p><strong>Creating conda virtual environment</strong></p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">venv_name</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">venv_name</span>
+<span class="n">conda</span> <span class="n">config</span>  <span class="o">--</span><span class="n">env</span> <span class="o">--</span><span class="n">add</span> <span class="n">channels</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+<span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="n">env</span> <span class="o">--</span><span class="nb">set</span> <span class="n">channel_priority</span> <span class="n">strict</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="n">geopandas</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="n">PDAL</span>
+</pre></div>
+</div>
+<ol class="loweralpha simple" start="2">
+<li><p><strong>Cloning the repo and install the dependency packages using *requirements.txt*</strong></p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Abuton</span><span class="o">/</span><span class="n">lidarDataExtractor</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">lidarDataExtractor</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<p>The <em>notebook_walkthrough</em> folder contains notebook that shows how to use each function in the package</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>`my_viz.ipynb` notebook shows some visuals using folium python package to plot raster image on street maps. It also shows point heatmaps, markers and point cloud data
+`raster_getter_demo.ipynb` notebook shows how to use the package to get a raster terrain file by passing the bound. It also shows how to reproject crs
+`visualization_demo.ipynb` notebook shows how to use the *visualize* module to visualize the tif and shp files
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="generated/lidardataextractor.visualizer.visualize.html" class="btn btn-neutral float-right" title="lidardataextractor.visualizer.visualize" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to lidardataextractor’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Abuton.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
