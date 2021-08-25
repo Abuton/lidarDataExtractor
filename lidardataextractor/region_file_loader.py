@@ -3,7 +3,7 @@ import boto3
 import logging
 import asyncio
 from aiohttp import ClientSession
-from ept_info import Info
+from lidardataextractor.ept_info import Info
 
 form = logging.Formatter("%(asctime)s : %(levelname)-5.5s : %(message)s")
 logger = logging.getLogger()
