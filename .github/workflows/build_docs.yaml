@@ -1,0 +1,42 @@
+name: Build & Publish Docs with Sphinx
+
+on:
+  release:
+    types: [published]
+
+
+jobs:
+  release:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+
+    - name: Install dependencies & Convert README
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r test_requirements.txt
+        m2r README.md
+
+    - name: Find and Replace
+      uses: jacobtomlinson/gha-find-replace@master
+      with:
+        include: "README.rst"
+
+    - name: Move README.rst & Build sphinx documentation
+      run: |
+        mv README.rst docs/source
+        cd docs
+        make html
+
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        BRANCH: gh-pages # The branch the action should deploy to.
+        FOLDER: docs/build/html # The folder the action should deploy.
