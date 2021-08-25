@@ -9,9 +9,9 @@ Lidardataextractor is an open-source python package for retrieving, transforming
     - AWS Account : Create One [here](https://aws.amazon.com/resources/create-account/)
     - PDAL : Python Data Abstraction Library
     - boto3 : Python API for performing actions/tasks on AWS
-    - geopandas : Python library to manipulate geospatial datasets
+    - geopandas/rasterio : Python library to manipulate geospatial datasets
     - earthpy : Used for Raster data Visualization
-    
+
 ### Data
 
 The USGS 3D Elevation Program (3DEP) provides access to lidar point cloud data from the 3DEP repository. The adoption of cloud storage and computing by 3DEP allows users to work with massive datasets of lidar point cloud data without having to download them.
@@ -31,13 +31,14 @@ a. **Creating conda virtual environment**
 
 b. **Cloning the repo and install the dependency packages using `requirements.txt`**
 
-    git clone `https://github.com/Abuton/lidarDataExtractor.git`
+    git clone https://github.com/Abuton/lidarDataExtractor.git
     cd lidarDataExtractor
-    `conda install -r requirements.txt`
+    conda install -r requirements.txt
 
 ### Usage
 
 The *notebook_walkthrough* folder contains notebook that shows how to use each function in the package
+
     `my_viz.ipynb` notebook shows some visuals using folium python package to plot raster image on street maps. It also shows point heatmaps, markers and point cloud data
     `raster_getter_demo.ipynb` notebook shows how to use the package to get a raster terrain file by passing the bound. It also shows how to reproject crs
     `visualization_demo.ipynb` notebook shows how to use the *visualize* module to visualize the tif and shp files
