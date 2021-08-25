@@ -34,3 +34,10 @@ b. **Cloning the repo and install the dependency packages using `requirements.tx
     git clone `https://github.com/Abuton/lidarDataExtractor.git`
     cd lidarDataExtractor
     `conda install -r requirements.txt`
+
+### Usage
+
+The *notebook_walkthrough* folder contains notebook that shows how to use each function in the package
+    `my_viz.ipynb` notebook shows some visuals using folium python package to plot raster image on street maps. It also shows point heatmaps, markers and point cloud data
+    `raster_getter_demo.ipynb` notebook shows how to use the package to get a raster terrain file by passing the bound. It also shows how to reproject crs
+    `visualization_demo.ipynb` notebook shows how to use the *visualize* module to visualize the tif and shp files
