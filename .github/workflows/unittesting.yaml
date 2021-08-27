@@ -1,4 +1,4 @@
-name: Package-Module-Testing
+name: Package-Module-UnitTesting
 on: 
   push:
     branches:
