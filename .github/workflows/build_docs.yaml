@@ -1,12 +1,10 @@
 name: Build & Publish Docs with Sphinx
 
 on:
-  release:
-    types: [published]
-
+  push:
 
 jobs:
-  release:
+  run:
     name: Build
     runs-on: ubuntu-latest
     steps:
