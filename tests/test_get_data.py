@@ -24,13 +24,14 @@ class TestRasterGetter(unittest.TestCase):
         self.bounds = "([-10425171.940, -10423171.940], [5164494.710, 5166494.710])"
         self.crs = 3857
         self.raster = RasterGetter(self.bounds, self.crs)
+        self.tif_file = 'IA_FullState.tif'
 
     def test_get_region(self):
-        self.assertIn(self.region, self.raster.get_region(self.bounds))
+        self.assertIn(self.region, self.raster.get_regions())
 
     def test_get_geodataframe(self):
-        self.assertIsInstance(self.raster.get_geodataframe(self.region, False, 5),
-                              gpd.GeoDataFrame)
+        self.assertIsInstance(self.raster.get_geodataframe(tif_file=self.tif_file, region=self.region),
+                              None)
 
     def test_region_gdf_dict(self):
-        self.assertIsInstance(self.raster.region_gdf_dict(False, 5), dict)
+        self.assertIsInstance(self.raster.year_gpd_dict(), dict)
