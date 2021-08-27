@@ -160,12 +160,7 @@ class RasterGetter:
         ----------
         tif_file : str : filename/location of a tif image
    
-        region:str :
-            
-        save: bool :
-             (Default value = True)
-        viz:bool :
-             (Default value = False)
+        region:str : name of the region to get the data from
 
         Returns
         -------
@@ -243,7 +238,7 @@ class RasterGetter:
             try:
                 logger.info(f"\nGetting DEM for {year}")
                 self.get_raster_terrain(region)
-                year_gpd[year] = self.get_geodataframe(f"{str(region).strip('/')}.tif", region=region, save=True, viz=True)
+                year_gpd[year] = self.get_geodataframe(f"{str(region).strip('/')}.tif", region=region)
                 self.save_geodataframe(csv_filename=f"data/{str(region).strip('/')}.csv")
 
             except Exception as e:
@@ -308,7 +303,7 @@ class RasterGetter:
         gdal.Polygonize(srcband, None, dst_layer, 0, [], callback=None) 
         logger.info(f'Shp file created successfully here {shp_filename}')
 
-    def get_point_elevation_twi(self, tif_filename:str, shp_filename:str, point_elevation_filename:str, resolution:int=5)-> gpd.GeoDataFrame:
+    def get_point_elevation_twi(self, tif_filename:str, shp_filename:str, point_elevation_filename:str, resolution:int=5):
         """
         The function computes and returns a geodataframe
 
@@ -351,4 +346,4 @@ if __name__ == "__main__":
     raster = RasterGetter(bounds=BOUNDS, crs=3857)
     # year_dict = raster.year_gpd_dict()
     # pprint(year_dict)
-    raster.get_geodataframe(f"IA_FullState.tif", "IA_FullState")
+    raster.get_geodataframe("IA_FullState.tif", "IA_FullState")

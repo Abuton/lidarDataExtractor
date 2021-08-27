@@ -29,10 +29,6 @@ class TestRasterGetter(unittest.TestCase):
     def test_get_region(self):
         self.assertIn(self.region, self.raster.get_regions())
 
-    def test_get_geodataframe(self):
-        self.assertIsInstance(self.raster.get_geodataframe(tif_file=self.tif_file, region=self.region),
-                              None)
-
     def test_region_gdf_dict(self):
         self.assertIsInstance(self.raster.year_gpd_dict(), dict)
 
