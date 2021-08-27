@@ -9,12 +9,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-      - name: config-aws
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-west-1
+    - name: config-aws
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      aws-region: eu-west-1
 
     - name: setup-conda
       uses: s-weigand/setup-conda@v1.0.7
@@ -25,7 +25,9 @@ jobs:
 
     - name: setUp-Env
       run: | 
+        conda install -c conda-forge pdal python-pdal gdal geopandas
         pip install -r test_requirements.txt
+        pip install -r requirements.txt
 
     - name: run-tests
       run: |
