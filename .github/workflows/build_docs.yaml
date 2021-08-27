@@ -1,10 +1,12 @@
 name: Build & Publish Docs with Sphinx
 
 on:
-  push:
+  release:
+    types: [published]
+
 
 jobs:
-  run:
+  release:
     name: Build
     runs-on: ubuntu-latest
     steps:
@@ -18,7 +20,7 @@ jobs:
     - name: Install dependencies & Convert README
       run: |
         python -m pip install --upgrade pip
-        pip install -r test_requirements.txt
+        pip install -r m2r
         m2r README.md
 
     - name: Find and Replace
