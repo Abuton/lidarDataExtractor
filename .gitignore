@@ -1,7 +1,7 @@
 __pycache__
 shp/
 *.csv
-*.tif
+# *.tif
 *.laz
 data/
 *.png
