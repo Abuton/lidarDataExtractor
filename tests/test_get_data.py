@@ -35,3 +35,6 @@ class TestRasterGetter(unittest.TestCase):
 
     def test_region_gdf_dict(self):
         self.assertIsInstance(self.raster.year_gpd_dict(), dict)
+
+if __name__ == "__main__":
+    unittest.main()
