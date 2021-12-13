@@ -2,7 +2,7 @@
 
 [![Made withJupyter](https://img.shields.io/badge/Made%20with-Jupyter-orange?style=for-the-badge&logo=Jupyter)](https://jupyter.org/try)
 
-Lidardataextractor is an open-source python package for retrieving, transforming, and visualizing point cloud data obtained through an aerial LiDAR survey. Using the package, you can select a region of interest, and download the related point cloud dataset with its metadata in different file formats (.laz, .tif, or as an ASCII file), perform transformation and visualization using the downloaded data.
+Lidardataextractor is an open-source python package for retrieving, transforming, and visualizing point cloud data obtained through an aerial LiDAR survey. Using the package, you can select a region of interest, and download the related point cloud dataset with its metadata in different file formats (.laz, .tif, or as an ASCII file), perform transformation and visualization using the downloaded data
 
 ## Requirements
 
@@ -20,7 +20,7 @@ The point cloud data is freely accessible from AWS in EPT format. Entwine Point 
 
 ### Installation
 
-a. **Creating conda virtual environment**
+a. **How to create a conda virtual environment**
 
     conda create -n venv_name
     conda activate venv_name
@@ -29,7 +29,7 @@ a. **Creating conda virtual environment**
     conda install geopandas
     conda install PDAL
 
-b. **Cloning the repo and install the dependency packages using `requirements.txt`**
+b. **Clone the repo and install the dependency packages using `requirements.txt`**
 
     git clone https://github.com/Abuton/lidarDataExtractor.git
     cd lidarDataExtractor
